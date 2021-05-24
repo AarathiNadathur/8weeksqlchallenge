@@ -76,14 +76,14 @@ select s.customer_id,sum(cte.points)as total_points from cte join sales s
 on s.product_id=cte.product_id  group by s.customer_id;
 
 # 10) In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
-with dates as (
+with cte as (
 	select 
 		me.*, s.*,datediff(s.order_date, me.join_date) as datedif,
 me.join_date + 7 as first_week from sales s join members me on 
 s.customer_id = me.customer_id
 )
 	select d.customer_id,
-		SUM(case when s. order_date < d.first_week  then (m.price * 10 * 2) else (m.price * 10) end ) as points_eoj
-	from dates d join menu m on m.product_id=d.product_id 
-    where d.datedif>0
-	group by d. customer_id ;
+		SUM(case when s. order_date < cte.first_week  then (m.price * 10 * 2) else (m.price * 10) end ) as points
+	from cte  join menu m on m.product_id=cte.product_id 
+    where cte.datedif>0
+	group by cte. customer_id ;
